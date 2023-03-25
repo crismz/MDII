@@ -1,13 +1,10 @@
-#include <stdlib.h>
-#include <string.h>
-
 typedef unsigned int u32;
 
 typedef struct 
 {
-    u32 indice;
+    u32 nombre;
     u32 *vecinos;
-} vertice;
+} VerticeSt;
 
 typedef struct 
 {
@@ -17,7 +14,7 @@ typedef struct
     u32 num_lados;                          // Numero de lados
     u32 delta;                              // Maximo grado
 
-    vertice* vertices;                     // Arreglo con los vertices        
+    VerticeSt** vertices;                     // Arreglo con los vertices        
 
 } GrafoSt;
 

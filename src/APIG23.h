@@ -12,9 +12,8 @@
 
 
 //Grafo es un puntero a una estructura GrafoSt, la cual debe estar definida en el .h de arriba
-
 typedef GrafoSt *Grafo;
-
+typedef VerticeSt *vertice;
 
 //construcci'on/destrucci'on
 

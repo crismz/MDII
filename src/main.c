@@ -5,7 +5,6 @@ int main (int argc, char** argv)
     (void) argc;
     (void) argv;
 
-    IndiceVecino(12, 32, NULL);
-
+    Grafo G = ConstruirGrafo();
     return 0;
 }
