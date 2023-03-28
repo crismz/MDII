@@ -2,9 +2,6 @@
 
 int main (int argc, char** argv)
 {
-    (void) argc;
-    (void) argv;
-
-    Grafo G = ConstruirGrafo();
+    Grafo G = ConstruirGrafo(argv[1]);
     return 0;
 }

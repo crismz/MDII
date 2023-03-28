@@ -49,14 +49,14 @@ static void agregar_vecino(Grafo G, vertice v1, vertice v2)
     v1->vecinos[grado] = v2->nombre;    
 }
 
-Grafo ConstruirGrafo()
+Grafo ConstruirGrafo(char* filepath)
 {
     FILE *file = stdin;
     // Salteamos los comentarios
     char buf[MAX_BUF];
     while (buf[0] == 'c'){
         // ignoramos las lineas que comienzan con c
-        fgets(buf, MAX_BUF, file); 
+        ("%c/n",fgets(buf, MAX_BUF, file)); 
     }
 
     //allocar memoria para la estructura principal
@@ -66,8 +66,6 @@ Grafo ConstruirGrafo()
     g->num_lados = 0;
     g->delta = 0;
     g->vertices = NULL;
-    g->nombres = NULL;
-    g->grados = NULL;
 
     agregar_vertice(g, 1);
 }
@@ -84,16 +82,16 @@ u32 NumeroDeLados(Grafo G)
 
 u32 Nombre(u32 i, Grafo G)
 {
-    return G->nombres[i];
+    return G->vertices[i].nombre;
 }
 
 u32 IndiceVecino(u32 i, u32 j, Grafo G)
 {
     if (i >= G->num_vertices || 
-        (i < G->num_vertices && j >= G->grados[i])) 
+        (i < G->num_vertices && j >= G->vertices[i].grado)) 
         return MAX_VERTICES;
 
-    return G->vertices[i]->vecinos[j];
+    return G->vertices[i].vecinos[j];
 }
 
 
