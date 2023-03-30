@@ -18,7 +18,7 @@ static void agregar_vertice(Grafo G, u32 nombre_vertice)
     u32 i = 0;
 
     while (i < num_vertice){
-        if (G->vertices[indice_vertice]->nombre == nombre_vertice){
+        if (G->vertices[indice_vertice].nombre == nombre_vertice){
             // ya existe
             //return G->vertices[indice_vertice];
             return;
@@ -44,21 +44,11 @@ static void agregar_vecino(Grafo G, vertice v1, vertice v2)
      *  -realloc???
      *  -casos
      */
-    assert(v1->nombre != v2->nombre);
-    u32 grado = G->grados[v1->nombre % G->num_vertices];
-    v1->vecinos[grado] = v2->nombre;    
+
 }
 
-Grafo ConstruirGrafo(char* filepath)
+Grafo ConstruirGrafo()
 {
-    FILE *file = stdin;
-    // Salteamos los comentarios
-    char buf[MAX_BUF];
-    while (buf[0] == 'c'){
-        // ignoramos las lineas que comienzan con c
-        ("%c/n",fgets(buf, MAX_BUF, file)); 
-    }
-
     //allocar memoria para la estructura principal
     Grafo g;
     g = malloc(sizeof(GrafoSt));
