@@ -19,7 +19,7 @@ typedef VerticeSt *vertice;
 
 // debe leer desde stdin
 // Por ahora se agrego un parametro, despues ver como hacer para hacerlo sin parametro
-Grafo ConstruirGrafo(char* filepath);
+Grafo ConstruirGrafo();
 
 void DestruirGrafo(Grafo G);
 
