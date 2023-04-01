@@ -1,6 +1,6 @@
 #include "APIG23.h"
 
-int main (int argc, char** argv)
+int main ()
 {
     Grafo G = ConstruirGrafo();
 
