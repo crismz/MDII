@@ -16,17 +16,3 @@ typedef struct
     VerticeSt* vertices;                     // Arreglo con los vertices        
 
 } GrafoSt;
-
-
-/*
-
-vecino(j, i, G) = G->vertices[i]->vecinos[j];
-
-
-
-
-
-
-
-
-*/
