@@ -5,31 +5,33 @@
 #include <assert.h>
 #include "APIG23.h"
 
-#define MAX_BUF 128
 #define MAX_VERTICES (u32) 4294967295
 
-/*  Funciones auxiliares para crear grafos */
+/* Estructura auxiliar */
 
 typedef struct edge {
     u32 v1;
     u32 v2;
 } edge;
 
-static int LeerLineaP(u32 *n, u32 *m){
-    char buff[1024];            // Buffer para linea
-    char p;                     // Char para sscanf (Ignorar) 
-    char edge[5];               // String para sscanf (Ignorar)
-    int findEdge = 0;
+/*  Funciones auxiliares para crear grafo */
+
+// Funcion para leer la linea p
+// Leemos stdin, se coloca en buff y se escanea del buff
+static int LeerLineaP(u32 *n, u32 *m, char* buff){
+    char p;                     // Char para sscanf 
+    char edge[5];               // String para sscanf 
+    int encontroEdge = 0;       // Actua como un booleano
     
-    while(buff[0] != 'e' && fgets(buff,1024,stdin) != NULL){
+    while(fgets(buff, 1024, stdin) != NULL && buff[0] != 'e'){
         if(buff[0] == 'p'){
             sscanf(buff, "%c %s %u %u",&p, edge, n, m);
             if(strcmp(edge,"edge") != 0) return 0;
-            findEdge = 1;
+            encontroEdge = 1;
         }   
     }
 
-    return findEdge;
+    return encontroEdge;
 }
 
 static void destruirArreglo(edge* arr){
@@ -37,8 +39,10 @@ static void destruirArreglo(edge* arr){
     arr = NULL;
 }
 
-static edge* construirArreglo(u32 m){
-    char buff[1024];            // Buffer para linea
+// Funcion para construir estructura auxiliar
+// Se hace del tamaño 2*m para que esten todos los lados 
+// y los lados invertidos (es decir va a estar 1 2 y 2 1)
+static edge* construirArreglo(u32 m,char* buff){
     char p;                     // Char para sscanf  
     u32 v1 = 0;                 // Aux para vertice 1
     u32 v2 = 0;                 // Aux para vertice 2
@@ -85,7 +89,8 @@ static void agregarVecino(Grafo g, u32 indexVertice, u32 vecino, u32 indexVecino
     g->vertices[indexVertice].vecinos[indexVecino] = vecino;
 }
 
-int comparator(const void* p, const void* q){
+// Funcion para el qsort
+static int comparator(const void* p, const void* q){
     edge* edge1 = ((edge*) p);
     edge* edge2 = ((edge*) q);
 
@@ -103,40 +108,26 @@ int comparator(const void* p, const void* q){
             return -1;
         }   
     }
-    /* El casteo hace que no funque para numeros u32 bordes
-    int first = ((int)edge1->v1) - ((int)edge2->v1);
-    int second = ((int)edge1->v2) - ((int)edge2->v2);
-
-    if(first == 0){
-        return second;
-    }
-    return first;
-    */
 }
 
+/* Fin de funciones auxiliares para crear grafo */
 
 
 Grafo ConstruirGrafo()
 {
+    char buff[1024];            // Buffer para linea
     u32 n = 0;                  // Nro de vertices
     u32 m = 0;                  // Nro de lados
 
-    if(!LeerLineaP(&n,&m)){
+    if(!LeerLineaP(&n, &m, buff)){
         return NULL;
     }    
 
-    edge* arrayEdges = construirArreglo(m);
+    edge* arrayEdges = construirArreglo(m, buff);
     if(!arrayEdges) return NULL;
    
     qsort(arrayEdges, 2*m, sizeof(edge), comparator);
 
-    /* Debug
-    for(u32 i = 0; i < 2*m; i++){
-        printf("%u %u\n", arrayEdges[i].v1, arrayEdges[i].v2);
-    }
-    */
-
-    //allocar memoria para la estructura principal
     Grafo g = NULL;
     g = malloc(sizeof(GrafoSt));
     g->num_vertices = n;
@@ -166,6 +157,7 @@ Grafo ConstruirGrafo()
             grado++;
             indexVecino++;
             indexArray++;
+            if(indexArray == 2*m) break;            // Para el caso del ultimo lado(caso borde)
         }
 
         g->vertices[j].grado = grado;
