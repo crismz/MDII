@@ -7,14 +7,73 @@
 
 #define MAX_VERTICES (u32) 4294967295
 
-/* Estructura auxiliar */
+/* Estructuras auxiliar */
 
 typedef struct edge {
     u32 v1;
     u32 v2;
 } edge;
 
+typedef struct verticeIndice {
+    u32 v;
+    u32 index;
+} verticeIndice;
+
+
 /*  Funciones auxiliares para crear grafo */
+
+static verticeIndice** creartablaHash(edge* arregloLados, u32 tableSize, u32 m){
+    u32 hindex=0, hclave=0, vertCont=0;
+    verticeIndice** tablaHash = calloc(tableSize, sizeof(verticeIndice*)); 
+
+    hclave = arregloLados[0].v1 % tableSize;
+    tablaHash[hclave] = malloc(sizeof(verticeIndice));
+    tablaHash[hclave]->v = arregloLados[0].v1;
+    tablaHash[hclave]->index = vertCont;
+    vertCont++;
+
+    for(u32 i = 1; i < 2*m; i++){
+        if(arregloLados[i-1].v1 != arregloLados[i].v1){
+            hclave = arregloLados[i].v1 % tableSize;
+            for(u32 j=1; j<tableSize; j++){
+                hindex = (hclave + j) % tableSize;
+                if(tablaHash[hindex] == NULL){
+                    tablaHash[hclave] = malloc(sizeof(verticeIndice));
+                    tablaHash[hclave]->v = arregloLados[i].v1;
+                    tablaHash[hclave]->index = vertCont;
+                    vertCont++;
+                    break;
+                }
+            }
+        }       
+    }
+    return tablaHash;
+
+}
+
+static u32 buscarHash (verticeIndice** tablaHash, u32 vertice, u32 n){
+    u32 tableSize = 3*n;
+    u32 hindex = 0, vindex = 0;
+    u32 hclave = vertice % tableSize;
+
+    for(u32 i=0; i<tableSize; i++){
+        hindex = (hclave + i) % tableSize;
+        if(tablaHash[hindex]->v == vertice){
+            vindex = tablaHash[hindex]->index;
+            break;
+        }
+    }
+    return vindex;
+}
+
+static void destruirHash(verticeIndice** tablaHash, u32 tableSize){
+    for(u32 i = 0; i < tableSize; i++){
+        free(tablaHash[i]);
+        tablaHash[i] = NULL;
+    }
+    free(tablaHash);
+    tablaHash = NULL;
+}
 
 // Funcion para leer la linea p
 // Leemos stdin, se coloca en buff y se escanea del buff
@@ -42,7 +101,7 @@ static void destruirArreglo(edge* arr){
 // Funcion para construir estructura auxiliar
 // Se hace del tamaño 2*m para que esten todos los lados 
 // y los lados invertidos (es decir va a estar 1 2 y 2 1)
-static edge* construirArreglo(u32 m,char* buff){
+static edge* construirArregloLados(u32 m,char* buff){
     char p;                     // Char para sscanf  
     u32 v1 = 0;                 // Aux para vertice 1
     u32 v2 = 0;                 // Aux para vertice 2
@@ -82,11 +141,12 @@ static void agregarVertice(Grafo g, u32 v, u32 index){
     g->vertices[index].vecinos = NULL;
 }
 
-static void agregarVecino(Grafo g, u32 indexVertice, u32 vecino, u32 indexVecino){
+static void agregarVecino(Grafo g, u32 indexVertice, u32 vecino, u32 indexVecino, verticeIndice** tablaHash, u32 n){
     g->vertices[indexVertice].vecinos = realloc(g->vertices[indexVertice].vecinos,
                                                  (indexVecino+1)*sizeof(u32)); 
     
-    g->vertices[indexVertice].vecinos[indexVecino] = vecino;
+    u32 vecinoIndexado = buscarHash(tablaHash, vecino, n);
+    g->vertices[indexVertice].vecinos[indexVecino] = vecinoIndexado;
 }
 
 // Funcion para el qsort
@@ -123,10 +183,12 @@ Grafo ConstruirGrafo()
         return NULL;
     }    
 
-    edge* arrayEdges = construirArreglo(m, buff);
-    if(!arrayEdges) return NULL;
-   
-    qsort(arrayEdges, 2*m, sizeof(edge), comparator);
+    edge* arregloLados = construirArregloLados(m, buff);
+    if(!arregloLados) return NULL;
+
+    qsort(arregloLados, 2*m, sizeof(edge), comparator);
+
+    verticeIndice** tablaHash = creartablaHash(arregloLados, 3*n, m);
 
     Grafo g = NULL;
     g = malloc(sizeof(GrafoSt));
@@ -144,16 +206,16 @@ Grafo ConstruirGrafo()
         grado = 0;
         indexVecino = 0;
 
-        agregarVertice(g, arrayEdges[indexArray].v1, j);  
-        agregarVecino(g, j, arrayEdges[indexArray].v2, indexVecino);
+        agregarVertice(g, arregloLados[indexArray].v1, j);  
+        agregarVecino(g, j, arregloLados[indexArray].v2, indexVecino, tablaHash, n);
 
         grado++;
         indexVecino++;
         indexArray++;
 
-        while (g->vertices[j].nombre == arrayEdges[indexArray].v1)
+        while (g->vertices[j].nombre == arregloLados[indexArray].v1)
         {   
-            agregarVecino(g, j, arrayEdges[indexArray].v2, indexVecino);
+            agregarVecino(g, j, arregloLados[indexArray].v2, indexVecino, tablaHash, n);
             grado++;
             indexVecino++;
             indexArray++;
@@ -169,7 +231,8 @@ Grafo ConstruirGrafo()
     
     g->delta = delta;
 
-    destruirArreglo(arrayEdges);
+    destruirHash(tablaHash, 3*n);
+    destruirArreglo(arregloLados);
 
     return g;
 }
@@ -210,7 +273,7 @@ u32 Grado(u32 i, Grafo G)
     return G->vertices[i].grado;
 }
 
-u32 IndiceVecino(u32 i, u32 j, Grafo G)
+u32 IndiceVecino(u32 j, u32 i, Grafo G)
 {
     if (i >= G->num_vertices || 
         (i < G->num_vertices && j >= G->vertices[i].grado)) 
@@ -218,6 +281,3 @@ u32 IndiceVecino(u32 i, u32 j, Grafo G)
 
     return G->vertices[i].vecinos[j];
 }
-
-
-
