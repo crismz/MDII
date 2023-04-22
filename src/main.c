@@ -26,8 +26,9 @@ int main (){
 
     for (u32 i=0; i<n; i++) Orden[i] = i;
 
+    OrdenImparPar(n, Orden, Color);
     u32 lol = Greedy(g, Orden, Color);
-    printf("\n\n\n\n\n %d \n\n\n\n\n", lol);
+    //printf("\n\n\n\n\n %d \n\n\n\n\n", lol);
     
     return 0;
 }
