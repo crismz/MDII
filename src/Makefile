@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -O3 -std=c99
-SOURCES = APIG23.c main.c
+SOURCES = APIG23.c APIParte2.c main.c
 OBJECTS = $(SOURCES:.c=.o)
 TARGET = main
 

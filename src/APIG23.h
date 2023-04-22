@@ -23,14 +23,11 @@ Grafo ConstruirGrafo();
 
 void DestruirGrafo(Grafo G);
 
-
-
 //funciones para extraer datos del grafo. u32 debe estar definida en el .h de arriba
 
 u32 NumeroDeVertices(Grafo G);
 u32 NumeroDeLados(Grafo G);
 u32 Delta(Grafo G);
-
 
 //funciones de extraccion de informacion de vertices 
 

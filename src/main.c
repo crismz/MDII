@@ -1,4 +1,7 @@
 #include "APIG23.h"
+#include "APIParte2.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void debugGrafo(Grafo g){
     printf("numvertices %u\n",g->num_vertices);
@@ -15,7 +18,16 @@ int main (){
 
     Grafo g = ConstruirGrafo();
     //debugGrafo(g);
-    DestruirGrafo(g);
+//    DestruirGrafo(g);
+    u32 n;
+    n = NumeroDeVertices(g);
+    u32* Orden = malloc(n*sizeof(u32));
+    u32* Color = malloc(sizeof(u32)*n);
 
+    for (u32 i=0; i<n; i++) Orden[i] = i;
+
+    u32 lol = Greedy(g, Orden, Color);
+    printf("\n\n\n\n\n %d \n\n\n\n\n", lol);
+    
     return 0;
 }
