@@ -23,25 +23,25 @@ int main (){
     u32* Color = malloc(sizeof(u32)*n);
 
     for (u32 i=0; i<n; i++) Orden[i] = i;
-
+    
     u32 lol = Greedy(g, Orden, Color);
 
-    for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
-    printf("\n");
-    for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
-    printf("\n Orden \n\n");
-
-    OrdenImparPar(n, Orden, Color);
-
-
-    for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
-    printf("\n Color \n\n");
-
+    //for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
+    //printf("\n");
+    //for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
+    //printf("\n Orden \n\n");
 
     printf("\n\n X %u \n\n", lol);
 
+    OrdenImparPar(n, Orden, Color);
+
+    //for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
+    //printf("\n Color \n\n");
+
+
     lol = Greedy(g, Orden, Color);
     
+    /*
     for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
     printf("\n");
     for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
@@ -49,17 +49,21 @@ int main (){
     
     for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
     printf("\n Color \n\n");
-
+    */
     //printf("\n\n X %u \n\n", lol);
     
     
     for(u32 i = 0; i < 500; i++){
         OrdenImparPar(n, Orden, Color);
         lol = Greedy(g, Orden, Color);
-        //printf("\n\n X %u  nro %d \n\n", lol, (i+3));
+        printf("\n\n X %u  nro %d \n\n", lol, (i+3));
     }
     
     printf("\n\n X %u \n\n", lol);
     
+    DestruirGrafo(g);
+    free(Orden);
+    free(Color);
+
     return 0;
 }
