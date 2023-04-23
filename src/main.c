@@ -17,8 +17,6 @@ void debugGrafo(Grafo g){
 int main (){
 
     Grafo g = ConstruirGrafo();
-    //debugGrafo(g);
-//    DestruirGrafo(g);
     u32 n;
     n = NumeroDeVertices(g);
     u32* Orden = malloc(n*sizeof(u32));
@@ -26,9 +24,42 @@ int main (){
 
     for (u32 i=0; i<n; i++) Orden[i] = i;
 
-    OrdenImparPar(n, Orden, Color);
     u32 lol = Greedy(g, Orden, Color);
-    //printf("\n\n\n\n\n %d \n\n\n\n\n", lol);
+
+    for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
+    printf("\n");
+    for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
+    printf("\n Orden \n\n");
+
+    OrdenImparPar(n, Orden, Color);
+
+
+    for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
+    printf("\n Color \n\n");
+
+
+    printf("\n\n X %u \n\n", lol);
+
+    lol = Greedy(g, Orden, Color);
+    
+    for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
+    printf("\n");
+    for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
+    printf("\n Orden \n\n");
+    
+    for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
+    printf("\n Color \n\n");
+
+    //printf("\n\n X %u \n\n", lol);
+    
+    
+    for(u32 i = 0; i < 500; i++){
+        OrdenImparPar(n, Orden, Color);
+        lol = Greedy(g, Orden, Color);
+        //printf("\n\n X %u  nro %d \n\n", lol, (i+3));
+    }
+    
+    printf("\n\n X %u \n\n", lol);
     
     return 0;
 }

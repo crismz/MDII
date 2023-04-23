@@ -3,12 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct ColorOrden {
+    u32 color;
+    u32 indice;
+} ColorOrden;
+
+
 u32 Greedy(Grafo G, u32* Orden, u32* Color)
 {
     u32 n = NumeroDeVertices(G);
     u32 color = 0;
     u32 sinColor = Delta(G) + 2;
-
+    
     for (u32 i=0; i < n; i++) {
         Color[i] = sinColor;
     }
@@ -20,7 +26,7 @@ u32 Greedy(Grafo G, u32* Orden, u32* Color)
         u32 min = 0, aux = 0;
         while (flag) {
             for (u32 j=0; j<grado; j++) {
-                if (aux == Color[IndiceVecino(j, i, G)]){
+                if (aux == Color[IndiceVecino(j, Orden[i], G)]){
                     aux += 1;
                 }
             }
@@ -47,29 +53,39 @@ static int auxComparator(u32 a, u32 b)
 
 static int comparator(const void *p, const void *q) 
 {
-    u32 a = *(u32*) p;
-    u32 b = *(u32*) q;
+    ColorOrden* a = (ColorOrden*) p;
+    ColorOrden* b = (ColorOrden*) q;
 
-    printf("%u, %u\n", a, b);
-    if ((EsPar(a) && EsPar(b)) || (!EsPar(a) && !EsPar(b))){
-        return auxComparator(a, b);
+    if ((EsPar(a->color) && EsPar(b->color)) 
+                        || (!EsPar(a->color) && !EsPar(b->color))){
+        return auxComparator(a->color, b->color);
     }   
-    if (EsPar(a) && !EsPar(b)) {
+    if (EsPar(a->color) && !EsPar(b->color)) {
         return 1;
     } else return -1;
 }
 
 char OrdenImparPar(u32 n, u32* Orden, u32* Color)
 {   
+    ColorOrden* ColorStruct = malloc(n * sizeof(ColorOrden));
+    
+    if (ColorStruct == NULL) {
+        free(ColorStruct);    
+        return (char) 1;
+    }
+
     for (u32 i=0; i<n; i++){
-        Orden[i] = Color[i];
+        ColorStruct[i].indice = i;
+        ColorStruct[i].color = Color[i];
     }
-    qsort(Orden, n, sizeof(u32), comparator);
-/*
-    for (u32 i=0; i<n; i++) {
-        printf("\n %u \n", Orden[i]);
+
+    qsort(ColorStruct, n, sizeof(ColorStruct), comparator);
+
+    for (u32 i=0; i<n; i++){
+        Orden[i] = ColorStruct[i].indice;
     }
-*/
+
+    free(ColorStruct);
     return (char) 0;
 }
 
