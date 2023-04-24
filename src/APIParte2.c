@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define ERROR_NUM (u32) 4294967295
+
 typedef struct ColorOrden {
     u32 color;
     u32 indice;
@@ -79,6 +81,8 @@ u32 Greedy(Grafo G, u32* Orden, u32* Color)
         u32 grado = Grado(Orden[i], G);
         u32* colorVecinos = malloc(sizeof(u32) * grado);
 
+        if (colorVecinos == NULL) return ERROR_NUM;
+
         for(u32 j=0; j<grado; j++){
             colorVecinos[j] =  Color[IndiceVecino(j, Orden[i], G)];
         }
@@ -124,9 +128,8 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color)
 {   
     ColorOrden* colorOrden = malloc(n * sizeof(ColorOrden));
     
-    if (colorOrden == NULL) {
-        free(colorOrden);    
-        return (char) 1;
+    if (colorOrden == NULL) {   
+        return '0';
     }
 
     for (u32 i=0; i<n; i++){
@@ -141,7 +144,7 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color)
     }
 
     free(colorOrden);
-    return (char) 0;
+    return '0';
 }
 
 static int comparatorOrdenNatural(const void *p, const void *q){
@@ -168,6 +171,16 @@ static u32 contarColores (ColorOrden* colorOrden, u32 n){
     return r;
 }
 
+static void destruirJedi (JediOrden* jediOrden, u32 r){
+    for (u32 i = 0; i < r; i++){
+        if(jediOrden[i].indicesVertices != NULL)
+            free(jediOrden[i].indicesVertices);
+    }
+    free(jediOrden);
+    jediOrden = NULL;
+    return;
+}
+
 char OrdenJedi(Grafo G, u32 *Orden, u32 *Color){
     
     u32 n = NumeroDeVertices(G);
@@ -176,8 +189,7 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color){
     ColorOrden* colorOrden = malloc(n * sizeof(ColorOrden));
     
     if (colorOrden == NULL) {
-        free(colorOrden);
-        return (char) 1;
+        return '1';
     }
     
     for(u32 i=0; i < n; i++) {
@@ -191,12 +203,22 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color){
 
     JediOrden* jediOrden = malloc(r * sizeof(JediOrden)); 
 
+    if (jediOrden == NULL) {
+        free(colorOrden);
+        return '1';
+    }
+
     u32 j = 0;
 
     for (u32 i = 0; i < r; i++){
         u32 contadorV = 0;
         sumF = Grado(colorOrden[j].indice, G);
+
         u32* iVertices = malloc(sizeof(u32));
+        if(iVertices == NULL){
+            free(colorOrden);
+            destruirJedi(jediOrden, r);
+        }
 
         iVertices[contadorV] =  colorOrden[j].indice;
         contadorV++;
@@ -204,11 +226,22 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color){
         while (colorOrden[j].color == colorOrden[j+1].color){
             j++;
             sumF += Grado(colorOrden[j].indice, G);
+            
+            iVertices = realloc(iVertices, (contadorV+1) * sizeof(u32));
+            if(iVertices == NULL){
+                free(colorOrden);
+                destruirJedi(jediOrden, r);
+                return '1';
+            }
+
             iVertices[contadorV] =  colorOrden[j].indice;
             contadorV++;
+            
+            if(j == n-1) break;
         }
 
         sumF *= colorOrden[j].color;
+        j++;
 
         jediOrden[i].valorF = sumF;
         jediOrden[i].indicesVertices = iVertices;
@@ -217,7 +250,9 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color){
         iVertices = NULL;
     }
 
+
     qsort(jediOrden, r, sizeof(JediOrden), comparatorValorF);
+
 
     u32 v = 0;
     for (u32 i=0; i<r; i++){
@@ -228,13 +263,8 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color){
     }
 
 
-    return (char) 0;
+    free(colorOrden);
+    destruirJedi(jediOrden, r);
+
+    return '0';
 }
-
-/*
-orden = [1,0,2,3]
-color = [3,5,4,6] -> [6,5,4,3] 
-      = [0,1,2,3]  
-
-
-*/

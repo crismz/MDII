@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define ERROR_NUM (u32) 4294967295
+
 void debugGrafo(Grafo g){
     printf("numvertices %u\n",g->num_vertices);
     printf("numlados %u\n",g->num_lados);
@@ -20,64 +22,95 @@ int main (){
     u32 n;
     n = NumeroDeVertices(g);
     u32* Orden = malloc(n*sizeof(u32));
-    u32* Color = malloc(sizeof(u32)*n);
+    u32* Color1 = malloc(n*sizeof(u32));
+    u32* Color2 = malloc(n*sizeof(u32));
+    char error;
 
-    for (u32 i=0; i<n; i++) Orden[i] = i;
-    
-    u32 lol = Greedy(g, Orden, Color);
-
-    //for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
-    //printf("\n");
-    //for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
-    //printf("\n Orden \n\n");
-
-    //printf("\n\n X %u \n\n", lol);
-
-    for(u32 i = 0; i < n; i++) printf(" %u,%u,%u " ,Nombre(Orden[i], g), Grado(Orden[i],g),Color[i]);
-
-    Color[0] = 0; 
-    Color[1] = 0;
-    Color[2] = 1;
-    Color[3] = 1;
-    Color[4] = 2;
-    Color[5] = 2;
-
-    OrdenJedi(g, Orden, Color);
-
-    printf("\n");
-    for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
-
-    //OrdenImparPar(n, Orden, Color);
-
-    //for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
-    //printf("\n Color \n\n");
-
-
-    //lol = Greedy(g, Orden, Color);
-    
-    /*
-    for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
-    printf("\n");
-    for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
-    printf("\n Orden \n\n");
-    
-    for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
-    printf("\n Color \n\n");
-    */
-    //printf("\n\n X %u \n\n", lol);
-    
-    /*
-    for(u32 i = 0; i < 500; i++){
-        OrdenImparPar(n, Orden, Color);
-        lol = Greedy(g, Orden, Color);
-        printf("\n\n X %u  nro %d \n\n", lol, (i+3));
+    for (u32 i=0; i<n; i++){
+        Orden[i] = i;
     }
     
-    printf("\n\n X %u \n\n", lol);
-    */
+    Greedy(g, Orden, Color1);
+    Greedy(g, Orden, Color2);
+
+
+    u32 contador = 0;
+    int flag = 0;
+    u32 numC = 0;
+
+    for(u32 i=0; i < 500; i++){
+        if(contador % 16 == 0) flag = flag ? 0 : 1; 
+        if (flag){
+            printf("Flag 1");
+            error = OrdenImparPar(n, Orden, Color1);
+
+            if(error == '1') {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+            
+            numC = Greedy(g, Orden, Color1);
+
+            if(numC == ERROR_NUM) {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+            printf(" %u ", numC);
+
+            error = OrdenJedi(g, Orden, Color2);
+            
+            if(error == '1') {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+
+            numC = Greedy(g, Orden, Color2);
+            
+            if(numC == ERROR_NUM) {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+            printf(" %u ", numC);
+        }
+        else {
+            printf("FLAG 0");
+            error = OrdenImparPar(n, Orden, Color2);
+
+            if(error == '1') {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+            
+            Greedy(g, Orden, Color2);
+            if(numC == ERROR_NUM) {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+            printf(" %u ", numC);
+
+            error = OrdenJedi(g, Orden, Color1);
+            
+            if(error == '1') {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+            Greedy(g, Orden, Color1);
+            
+            if(numC == ERROR_NUM) {
+                printf("Error en alocacion de memoria");
+                break;
+            }
+            printf(" %u ", numC);
+        }
+        contador++;
+        printf("iteracion %u \n", contador);
+    }
+
+    
     DestruirGrafo(g);
     free(Orden);
-    free(Color);
+    free(Color1);
+    free(Color2);
 
     return 0;
 }
