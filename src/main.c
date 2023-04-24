@@ -31,15 +31,29 @@ int main (){
     //for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
     //printf("\n Orden \n\n");
 
-    printf("\n\n X %u \n\n", lol);
+    //printf("\n\n X %u \n\n", lol);
 
-    OrdenImparPar(n, Orden, Color);
+    for(u32 i = 0; i < n; i++) printf(" %u,%u,%u " ,Nombre(Orden[i], g), Grado(Orden[i],g),Color[i]);
+
+    Color[0] = 0; 
+    Color[1] = 0;
+    Color[2] = 1;
+    Color[3] = 1;
+    Color[4] = 2;
+    Color[5] = 2;
+
+    OrdenJedi(g, Orden, Color);
+
+    printf("\n");
+    for(u32 i = 0; i < n; i++) printf("%u " ,Nombre(Orden[i], g));
+
+    //OrdenImparPar(n, Orden, Color);
 
     //for(u32 i = 0; i < n; i++) printf("%u " ,Color[i]);
     //printf("\n Color \n\n");
 
 
-    lol = Greedy(g, Orden, Color);
+    //lol = Greedy(g, Orden, Color);
     
     /*
     for(u32 i = 0; i < n; i++) printf("%u " ,Orden[i]);
@@ -52,7 +66,7 @@ int main (){
     */
     //printf("\n\n X %u \n\n", lol);
     
-    
+    /*
     for(u32 i = 0; i < 500; i++){
         OrdenImparPar(n, Orden, Color);
         lol = Greedy(g, Orden, Color);
@@ -60,7 +74,7 @@ int main (){
     }
     
     printf("\n\n X %u \n\n", lol);
-    
+    */
     DestruirGrafo(g);
     free(Orden);
     free(Color);

@@ -8,10 +8,17 @@ typedef struct ColorOrden {
     u32 indice;
 } ColorOrden;
 
+typedef struct JediOrden {
+    u32 valorF;
+    u32* indicesVertices;
+    u32 cantidadV;
+} JediOrden;
+
 u32 primerColorDisponible(u32* arr, u32 n){
 
     int estaCero = 0;
-    
+    int estaUno = 0;
+
     for (u32 i=0; i < n; i++){
         if (arr[i] == 0){
             estaCero = 1;
@@ -21,8 +28,6 @@ u32 primerColorDisponible(u32* arr, u32 n){
 
     // Si cero esta disponible
     if(estaCero == 0) return 0;
-
-    int estaUno = 0;
     
     for (u32 i=0; i < n; i++){
         if (arr[i] == 1){
@@ -101,7 +106,7 @@ static int auxComparator(u32 a, u32 b)
     return 1;
 }
 
-static int comparator(const void *p, const void *q) 
+static int comparatorImparPar(const void *p, const void *q) 
 {
     ColorOrden* a = (ColorOrden*) p;
     ColorOrden* b = (ColorOrden*) q;
@@ -117,33 +122,113 @@ static int comparator(const void *p, const void *q)
 
 char OrdenImparPar(u32 n, u32* Orden, u32* Color)
 {   
-    ColorOrden* ColorStruct = malloc(n * sizeof(ColorOrden));
+    ColorOrden* colorOrden = malloc(n * sizeof(ColorOrden));
     
-    if (ColorStruct == NULL) {
-        free(ColorStruct);    
+    if (colorOrden == NULL) {
+        free(colorOrden);    
         return (char) 1;
     }
 
     for (u32 i=0; i<n; i++){
-        ColorStruct[i].indice = i;
-        ColorStruct[i].color = Color[i];
+        colorOrden[i].indice = i;
+        colorOrden[i].color = Color[i];
     }
 
-    qsort(ColorStruct, n, sizeof(ColorStruct), comparator);
+    qsort(colorOrden, n, sizeof(colorOrden), comparatorImparPar);
 
     for (u32 i=0; i<n; i++){
-        Orden[i] = ColorStruct[i].indice;
+        Orden[i] = colorOrden[i].indice;
     }
 
-    free(ColorStruct);
+    free(colorOrden);
     return (char) 0;
+}
+
+static int comparatorOrdenNatural(const void *p, const void *q){
+    ColorOrden* a = (ColorOrden*) p;
+    ColorOrden* b = (ColorOrden*) q;
+
+    if (a->color < b->color) return -1;
+    return 1;
+}
+
+static int comparatorValorF(const void *p, const void *q){
+    JediOrden* a = (JediOrden*) p;
+    JediOrden* b = (JediOrden*) q;
+
+    if (a->valorF > b->valorF) return -1;
+    return 1;
+}
+
+static u32 contarColores (ColorOrden* colorOrden, u32 n){
+    u32 r = 1;
+    for(u32 i = 0; i < n-1; i++){
+        if(colorOrden[i].color != colorOrden[i+1].color) r++; 
+    }
+    return r;
 }
 
 char OrdenJedi(Grafo G, u32 *Orden, u32 *Color){
     
+    u32 n = NumeroDeVertices(G);
+    u32 sumF = 0;
+
+    ColorOrden* colorOrden = malloc(n * sizeof(ColorOrden));
+    
+    if (colorOrden == NULL) {
+        free(colorOrden);
+        return (char) 1;
+    }
+    
+    for(u32 i=0; i < n; i++) {
+        colorOrden[i].indice = i;
+        colorOrden[i].color = Color[i];
+    }
+
+    qsort(colorOrden, n, sizeof(ColorOrden), comparatorOrdenNatural);
+
+    u32 r = contarColores(colorOrden, n);
+
+    JediOrden* jediOrden = malloc(r * sizeof(JediOrden)); 
+
+    u32 j = 0;
+
+    for (u32 i = 0; i < r; i++){
+        u32 contadorV = 0;
+        sumF = Grado(colorOrden[j].indice, G);
+        u32* iVertices = malloc(sizeof(u32));
+
+        iVertices[contadorV] =  colorOrden[j].indice;
+        contadorV++;
+
+        while (colorOrden[j].color == colorOrden[j+1].color){
+            j++;
+            sumF += Grado(colorOrden[j].indice, G);
+            iVertices[contadorV] =  colorOrden[j].indice;
+            contadorV++;
+        }
+
+        sumF *= colorOrden[j].color;
+
+        jediOrden[i].valorF = sumF;
+        jediOrden[i].indicesVertices = iVertices;
+        jediOrden[i].cantidadV = contadorV;
+
+        iVertices = NULL;
+    }
+
+    qsort(jediOrden, r, sizeof(JediOrden), comparatorValorF);
+
+    u32 v = 0;
+    for (u32 i=0; i<r; i++){
+        for(u32 j = 0; j < jediOrden[i].cantidadV; j++){
+            Orden[v] = jediOrden[i].indicesVertices[j];
+            v++;
+        }
+    }
 
 
-    return 1;
+    return (char) 0;
 }
 
 /*
