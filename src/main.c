@@ -36,12 +36,13 @@ int main (){
 
     u32 contador = 0;
     int flag = 0;
-    u32 numC = 0;
+    u32 numC1 = 0;
+    u32 numC2 = 0;
+
 
     for(u32 i=0; i < 500; i++){
         if(contador % 16 == 0) flag = flag ? 0 : 1; 
         if (flag){
-            printf("Flag 1");
             error = OrdenImparPar(n, Orden, Color1);
 
             if(error == '1') {
@@ -49,13 +50,12 @@ int main (){
                 break;
             }
             
-            numC = Greedy(g, Orden, Color1);
+            numC1 = Greedy(g, Orden, Color1);
 
-            if(numC == ERROR_NUM) {
+            if(numC1 == ERROR_NUM) {
                 printf("Error en alocacion de memoria");
                 break;
             }
-            printf(" %u ", numC);
 
             error = OrdenJedi(g, Orden, Color2);
             
@@ -64,16 +64,14 @@ int main (){
                 break;
             }
 
-            numC = Greedy(g, Orden, Color2);
+            numC2 = Greedy(g, Orden, Color2);
             
-            if(numC == ERROR_NUM) {
+            if(numC2 == ERROR_NUM) {
                 printf("Error en alocacion de memoria");
                 break;
             }
-            printf(" %u ", numC);
         }
         else {
-            printf("FLAG 0");
             error = OrdenImparPar(n, Orden, Color2);
 
             if(error == '1') {
@@ -81,12 +79,11 @@ int main (){
                 break;
             }
             
-            Greedy(g, Orden, Color2);
-            if(numC == ERROR_NUM) {
+            numC2 = Greedy(g, Orden, Color2);
+            if(numC2 == ERROR_NUM) {
                 printf("Error en alocacion de memoria");
                 break;
             }
-            printf(" %u ", numC);
 
             error = OrdenJedi(g, Orden, Color1);
             
@@ -94,19 +91,18 @@ int main (){
                 printf("Error en alocacion de memoria");
                 break;
             }
-            Greedy(g, Orden, Color1);
+            numC1 = Greedy(g, Orden, Color1);
             
-            if(numC == ERROR_NUM) {
+            if(numC1 == ERROR_NUM) {
                 printf("Error en alocacion de memoria");
                 break;
             }
-            printf(" %u ", numC);
         }
         contador++;
-        printf("iteracion %u \n", contador);
     }
 
-    
+    printf("X1 = %u, X2 = %u", numC1, numC2);
+
     DestruirGrafo(g);
     free(Orden);
     free(Color1);
