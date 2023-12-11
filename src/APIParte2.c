@@ -68,7 +68,7 @@ static u32 primerColorDisponible(u32* arr, u32 grado){
 
     // Cambia valores que no sirven a 1
     for (u32 i = 0; i < grado; i++){
-        if (arr[i] == 0 || arr[i] > grado) 
+        if (arr[i] == 0 || arr[i] >= grado) 
             arr[i] = 1;
     }
 
